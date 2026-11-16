@@ -375,3 +375,22 @@ a.fc{display:block}
 .allsv a:hover,.allsv a.cur{background:var(--brand-tint);color:var(--brand-text)}
 .allsv a:hover .i,.allsv a.cur .i{color:var(--brand)}
 .allsv a.cur{font-weight:600;box-shadow:inset 3px 0 0 var(--brand)}
+
+/* /track page (pages/TrackPage.tsx): search card above the shared #tracking result panel */
+.trk-search{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(18px,3vw,30px);max-width:760px}
+.trk-search>label{display:block;font-size:13px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:10px}
+.trk-search .track input{height:var(--btn-h);font-size:15px}
+.trk-search .track .btn{height:var(--btn-h)}
+.trk-search .track .btn:disabled{opacity:.7;cursor:progress}
+.trk-search .trk-help{margin-top:10px;font-size:var(--fs-sm);color:var(--muted)}
+.trk-search input[aria-invalid]{border-color:var(--brand)}
+.trk-search:has(input[aria-invalid]) .trk-help{color:var(--brand-text)}
+.trk-search .trk-call{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:var(--fs-sm);color:var(--muted)}
+.trk-search .trk-call .i{width:16px;height:16px;color:var(--brand);flex:none}
+.trk-search .trk-call a{color:var(--ink);font-weight:500;text-decoration:underline;text-underline-offset:3px}
+main.inner #tracking{padding:0}
+main.inner #tracking .wrap{max-width:none}
+/* tracking result panel eases in when a lookup finishes */
+@keyframes trk-in{from{opacity:0;transform:translateY(16px)}}
+main.inner #tracking.show{animation:trk-in .5s var(--ease) both}
+@media (prefers-reduced-motion:reduce){main.inner #tracking.show{animation:none}}

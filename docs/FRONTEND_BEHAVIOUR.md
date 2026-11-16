@@ -11,7 +11,7 @@
 1. **Scroll engine** (`hooks/useHomeScroll.ts`) — "stack mode" on ≥900px without reduced motion: `.stack` sections are sticky cards; `--p` (0–1) drives a subtle scale/dim of the card being covered. Inertial smooth wheel/keyboard scrolling on mouse devices. Registers a scroller in `lib/scroll.ts` so HashLinks and `/#hash` URLs land exactly on a section. Reports the section on screen to the header. Everything (listeners, `html.stackmode`, inline styles, `scroll-behavior`) is removed on unmount.
 2. **Reveal** (`useReveal('home')`) — `.reveal` → `.in` at 15% visibility, then the classes are removed after the transition; service cards also get `.drawn` (line-art drawing, `html.anim`).
 3. **Hero slides** (`HeroSection`) — crossfade every 6.5 s between air / sea / road; indicator buttons (no text) jump to a slide and restart the progress bar; paused while the tab is hidden.
-4. **Tracking** — empty submit focuses `#trk`; otherwise `trackShipment()` → `TrackingSection` shows (`#tracking.show`) and the page scrolls to it.
+4. **Tracking** — empty submit focuses `#trk`; otherwise the hero form navigates to `/track/<no>` (`TrackPage`), which calls `trackShipment()`, shows `TrackingSection` (`#tracking.show`) and scrolls to it.
 5. **Why Choose Us** — hovering a list item or pin highlights both (`.hot` / `.on`); the photo gets `.in` when 25% visible.
 6. **About video** — `#aboutVideo` plays when visible, pauses off-screen; muted/loop/playsinline.
 7. **Stats** — `CountUp` counts the number up once when 60% visible (static under reduced motion).

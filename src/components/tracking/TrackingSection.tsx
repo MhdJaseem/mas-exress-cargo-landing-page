@@ -2,18 +2,20 @@ import type { CSSProperties } from 'react';
 import type { TrackingResult } from '../../lib/api';
 import { Icon } from '../ui/Icon';
 
+// The order a shipment moves in (In Transit before At Destination). The billing app's statuses map onto these in
+// STAGE in src/lib/api.ts; "Arrived at Centre" waits for a warehouse status from the billing app.
 const STEPS = [
   'Booked & Dispatch',
   'Arrived at Centre',
-  'At Destination',
   'In Transit',
+  'At Destination',
   'Out for Delivery',
   'Delivered',
 ];
 const show = (v: unknown) => (v != null && v !== '' ? String(v) : '—');
 const num = (i: number) => String(i + 1).padStart(2, '0');
 
-/** Tracking result panel; hidden (CSS) until a search has been made. */
+/** Tracking result panel on /track; hidden (CSS) until a search has been made. */
 export function TrackingSection({ result }: { result: TrackingResult | null }) {
   const r = result;
   const summary: [string, unknown][] = [
@@ -36,7 +38,7 @@ export function TrackingSection({ result }: { result: TrackingResult | null }) {
   const fill = Math.max(0, stage) / (STEPS.length - 1);
 
   return (
-    <section id="tracking" className={`stack${r ? ' show' : ''}`} aria-live="polite">
+    <section id="tracking" className={r ? 'show' : undefined} aria-live="polite">
       <div className="wrap">
         <div className="tbox">
           <div className="tb-head">
@@ -143,11 +145,10 @@ export function TrackingSection({ result }: { result: TrackingResult | null }) {
             </div>
           </div>
 
-          {import.meta.env.DEV && (
+          {import.meta.env.DEV && !import.meta.env.VITE_API_BASE && (
             <p className="note">
-              Developer note (dev server only): connect the form to your tracking API in the{' '}
-              <code>trackShipment()</code> function in <code>src/lib/api.ts</code> — it renders the summary, details,
-              step progress and history table.
+              Developer note (dev server only): set <code>VITE_API_BASE</code> in <code>.env.local</code> to the MAS
+              billing app's address to load real tracking.
             </p>
           )}
         </div>

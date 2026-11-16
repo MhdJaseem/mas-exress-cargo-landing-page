@@ -15,11 +15,12 @@ src/router.tsx        route table (see below)
 src/components/
   layout/             RootLayout · Header · Footer (+ Socials) · WhatsAppWidget · IconSprite · ScrollManager
   ui/                 Icon · HashLink · PageHero · Heading/SectionHead · PickupForm · CountUp · TestimonialCard · TestimonialsSplit
-  home/               HeroSection · TrackingSection · AboutSection · ServicesSection (+ ServiceArt) · WhySection ·
+  home/               HeroSection · AboutSection · ServicesSection (+ ServiceArt) · WhySection ·
                       TestimonialsSection · PickupContactSection
   service/            ServiceBlocks (FeatureCard + one renderer per block kind)
   team/               TeamShowcase (Our Team carousel)
-src/pages/            HomePage · ServicePage · SolutionPage · AboutPage · TeamPage · BranchesPage · CareersPage · NotFoundPage
+  tracking/           TrackingSection (result panel on /track)
+src/pages/            HomePage · TrackPage · ServicePage · SolutionPage · AboutPage · TeamPage · BranchesPage · CareersPage · NotFoundPage
 src/data/             services.ts · solutions.ts · company.ts — all page copy that is not on the home page
 src/hooks/            useHomeScroll · useReveal · useDocumentMeta
 src/lib/              api.ts · site.ts · scroll.ts · activeSection.ts
@@ -37,6 +38,7 @@ vercel.json           SPA rewrite + legacy redirects for Vercel
 | `/` (index)                                              | `HomePage`                            |
 | `/<slug>` for each entry in `data/services.ts`           | `ServicePage service={…}`             |
 | `/solution/<slug>` for each entry in `data/solutions.ts` | `SolutionPage solution={…}`           |
+| `/track`, `/track/<tracking no>`                         | `TrackPage` (search + result panel)   |
 | `/about` `/our-team` `/our-branches` `/careers`          | company pages                         |
 | `/index.html`, `/<page>.html`                            | `<Navigate replace>` to the clean URL |
 | `*`                                                      | `NotFoundPage`                        |
@@ -51,7 +53,8 @@ vercel.json           SPA rewrite + legacy redirects for Vercel
 
 ## Page anatomy
 
-**Home** — direct children of `<main>`, all with class `stack`: `#home` hero (slides + Track / Call / Pickup cards) · `#tracking` result panel (hidden until a search) · `#about` (video + stats) · `#services` (4 cards + chips) · `#why` (photo with pins) · `#testimonials` (marquee) · `#pickup` (form + `#contact`).
+**Home** — direct children of `<main>`, all with class `stack`: `#home` hero (slides + Track / Call / Pickup cards; a search opens `/track/<no>`) · `#about` (video + stats) · `#services` (4 cards + chips) · `#why` (photo with pins) · `#testimonials` (marquee) · `#pickup` (form + `#contact`).
+**Tracking page** (`/track`) — `PageHero` → `.pbody.solo`: `.trk-search` form (`#trk-page`) and the `#tracking` result panel (hidden until a lookup). Header and sidebar "Track Shipment" buttons link here.
 **Service pages** — `PageHero` (`.phero`: photo, breadcrumb, H1, lead, buttons) → `.pbody` grid: `.main-col` of blocks from `data/services.ts` + `aside.side` (Enquire now button, All Services, Tracking, Request Pickup with the page's mode preselected).
 **Solution pages** — same layout as service pages: `PageHero` → `.pbody` with the live paragraphs, "Related Services" link cards, and a sidebar with "All Solutions".
 **Company pages** — `PageHero` → `.pbody.solo` (full width, no sidebar).

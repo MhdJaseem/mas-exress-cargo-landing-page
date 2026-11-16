@@ -1000,3 +1000,12 @@ footer .fcontact li>a{overflow-wrap:normal}
 /* reserve room for the longest title (2 lines) so nothing below jumps between slides */
 .hero-slide{min-height:116px}
 @media (max-width:620px){.hero-slide{min-height:88px}}
+
+/* Page change animation (View Transitions API). Only navigations that opt in animate: the tracking
+   searches and "Track Shipment" links pass viewTransition (React Router). The old page fades out, the
+   new one fades in and rises slightly. Browsers without the API just switch pages. */
+@keyframes vt-out{to{opacity:0}}
+@keyframes vt-in{from{opacity:0;transform:translateY(18px)}}
+::view-transition-old(root){animation:vt-out .25s var(--ease) both}
+::view-transition-new(root){animation:vt-in .45s var(--ease) .05s both}
+@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}

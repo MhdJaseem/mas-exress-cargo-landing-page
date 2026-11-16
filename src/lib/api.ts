@@ -4,8 +4,9 @@
    Contract: docs/TRACKING_API.md
    ------------------------------------------------------------------ */
 
-// e.g. https://api.masexpresscargo.com — set VITE_API_BASE in .env.local
-export const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+// The MAS billing app, which keeps the shipments, e.g. https://billing.masexpresscargo.com (no trailing slash).
+// Set VITE_API_BASE in .env.local and on Vercel. Empty = tracking shows "not available yet".
+export const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/, '');
 
 export interface TrackingEvent {
   date: string;
@@ -30,15 +31,90 @@ export interface TrackingResult {
   history: TrackingEvent[];
 }
 
+/** Shown in the result panel when the tracking service can't be reached (or isn't set up yet) */
+export const TRACKING_UNAVAILABLE = 'Online tracking is not available right now. Please call us on +971 800 4786.';
+
 /**
- * Look up a shipment.
- * Example once the backend exists:
- *   const r = await fetch(`${API_BASE}/api/track/${encodeURIComponent(no)}`);
- *   if (!r.ok) throw new Error('Shipment not found');
- *   return r.json();
+ * Billing app status → step in the progress bar (STEPS in components/tracking/TrackingSection.tsx).
+ * On hold / returned don't move the bar; the latest status still shows as Last Status.
+ */
+const STAGE: Record<string, number> = {
+  booked: 0,
+  packed: 0,
+  picked_up: 0,
+  dispatched: 2,
+  departed: 2,
+  in_transit: 2,
+  arrived_destination: 3,
+  customs_clearance: 3,
+  out_for_delivery: 4,
+  delivered: 5,
+};
+
+/** The billing app's answer: GET {API_BASE}/api/track?id=MAS1234567890 (MAS billing, app/api/track/route.ts) */
+interface BillingTracking {
+  trackingId: string;
+  destination: string;
+  latest: BillingEvent | null;
+  events: BillingEvent[];
+}
+interface BillingEvent {
+  status: string;
+  label: string;
+  location: string | null;
+  /** ISO time */
+  time: string;
+}
+
+const dubai = (iso: string, withTime = true) =>
+  new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Dubai',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    ...(withTime ? { hour: '2-digit', minute: '2-digit', hour12: false } : {}),
+  })
+    .format(new Date(iso))
+    .replace(',', '');
+
+/** "mas 1234-567 890" → "MAS1234567890" */
+export const normalizeTrackingNo = (no: string) => no.toUpperCase().replace(/[\s-]/g, '');
+
+/**
+ * Look up a shipment in the MAS billing app. Throws an Error whose message is shown to the customer
+ * (not found, wrong format, or tracking not available).
+ * The billing app never sends names, phones, addresses or money, so Shipper / Consignee stay empty.
  */
 export async function trackShipment(no: string): Promise<TrackingResult> {
-  return { no, stage: -1, history: [] }; // placeholder: no backend connected yet
+  const id = normalizeTrackingNo(no);
+  if (!API_BASE) throw new Error(TRACKING_UNAVAILABLE);
+
+  let r: Response;
+  try {
+    r = await fetch(`${API_BASE}/api/track?id=${encodeURIComponent(id)}`, { headers: { Accept: 'application/json' } });
+  } catch {
+    throw new Error(TRACKING_UNAVAILABLE);
+  }
+  const data = (await r.json().catch(() => null)) as (BillingTracking & { error?: string }) | null;
+  // 400: not a tracking number; 404: no such shipment (the billing app words both)
+  if (!r.ok || !data) throw new Error(data?.error || TRACKING_UNAVAILABLE);
+
+  const events = data.events ?? [];
+  const stage = Math.max(-1, ...events.map((e) => STAGE[e.status] ?? -1));
+  return {
+    no: data.trackingId,
+    lastStatus: data.latest?.label,
+    lastStatusDate: data.latest ? dubai(data.latest.time) : undefined,
+    bookingDate: events[0] ? dubai(events[0].time, false) : undefined,
+    origin: 'UAE',
+    destination: data.destination,
+    stage,
+    // newest first
+    history: events
+      .slice()
+      .reverse()
+      .map((e) => ({ date: dubai(e.time), activity: e.label, location: e.location ?? '—' })),
+  };
 }
 
 export interface PickupRequest {

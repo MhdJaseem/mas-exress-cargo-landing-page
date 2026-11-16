@@ -7,6 +7,7 @@ import AboutPage from './pages/AboutPage';
 import TeamPage from './pages/TeamPage';
 import BranchesPage from './pages/BranchesPage';
 import CareersPage from './pages/CareersPage';
+import TrackPage from './pages/TrackPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { services } from './data/services';
 import { solutions } from './data/solutions';
@@ -18,6 +19,8 @@ import { solutions } from './data/solutions';
    /air-freight …         one route per entry in data/services.ts
    /solution/<slug>       one route per entry in data/solutions.ts (same paths as the live site)
    /about /our-team /our-branches /careers
+   /track                 shipment tracking page (search form)
+   /track/<tracking no>   tracking page with that shipment looked up (the QR code on MAS invoices)
    *                      404
 
    Old ".html" addresses from the previous multi-page build redirect to the clean URLs.
@@ -54,6 +57,8 @@ export const routes: RouteObject[] = [
     element: <RootLayout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'track', element: <TrackPage /> },
+      { path: 'track/:no', element: <TrackPage /> },
       ...serviceRoutes,
       ...solutionRoutes,
       ...companyRoutes,

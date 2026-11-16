@@ -213,9 +213,9 @@ export function Header() {
           </li>
         </ul>
         <div className="mnav-cta">
-          <HashLink hash="hero-track" className="btn brand">
+          <Link to="/track" className="btn brand" viewTransition>
             Track Shipment
-          </HashLink>
+          </Link>
           <HashLink hash="pickup" className="btn">
             Request Pickup
           </HashLink>
@@ -223,9 +223,9 @@ export function Header() {
       </nav>
 
       <div className="actions">
-        <HashLink hash="hero-track" className="btn">
+        <Link to="/track" className="btn" viewTransition>
           Track Shipment
-        </HashLink>
+        </Link>
         {/* labelled on wide screens, icon-only below 1280px (label stays for screen readers) */}
         <HashLink hash="pickup" className="btn brand act-pickup" title="Request Pickup">
           <Icon name="plus" />

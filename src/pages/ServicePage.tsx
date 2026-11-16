@@ -65,9 +65,9 @@ export default function ServicePage({ service: s }: { service: Service }) {
               Access your shipment's real-time status, location, and documents through our integrated MAS Express Cargo
               Tracking System.
             </p>
-            <HashLink hash="hero-track" className="btn">
+            <Link to="/track" className="btn" viewTransition>
               Track Shipment <Icon name="arrow" />
-            </HashLink>
+            </Link>
           </div>
           <div className="pickup" id="pickup">
             <h2>Request Pickup</h2>

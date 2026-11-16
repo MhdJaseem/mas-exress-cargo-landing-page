@@ -2,46 +2,35 @@
 
 The front end is ready; the backend is not. This is the contract `src/lib/api.ts` expects (the `TrackingResult`, `PickupRequest` and `JobApplication` types there mirror it).
 
-## 1. Track a shipment
+## 1. Track a shipment (live: the MAS billing app)
 
-`GET {VITE_API_BASE}/api/track/{trackingNo}`
+Tracking comes from the MAS billing app (its `app/api/track/route.ts`), public, no sign-in:
+
+`GET {VITE_API_BASE}/api/track?id=MAS1234567890`
 
 **200 response**
 
 ```json
 {
-  "no": "MAS123456",
-  "lastStatusDate": "2026-10-21 14:05",
-  "shipper": "ABC Trading LLC",
-  "consignee": "XYZ Co.",
-  "bookingDate": "2026-10-18",
-  "lastStatus": "In transit",
-  "origin": "Sharjah, UAE",
-  "destination": "Riyadh, KSA",
-  "serviceType": "GCC Road Transport",
-  "pieces": 12,
-  "weight": "340 kg",
-  "stage": 2,
-  "history": [
-    { "date": "2026-10-19 09:10", "activity": "Picked up", "location": "Sharjah" },
-    { "date": "2026-10-20 16:40", "activity": "Departed hub", "location": "Sharjah" }
+  "trackingId": "MAS1234567890",
+  "destination": "India",
+  "latest": { "status": "in_transit", "label": "In transit", "location": "Dubai", "time": "2026-11-16T08:10:00.000Z" },
+  "events": [
+    { "status": "booked", "label": "Booked", "location": null, "time": "2026-11-14T06:00:00.000Z" },
+    { "status": "in_transit", "label": "In transit", "location": "Dubai", "time": "2026-11-16T08:10:00.000Z" }
   ]
 }
 ```
 
-- `stage` = index of the current step in the `#steps` progress bar on the home page (0–5; `-1` = none). Agree the six step labels with ops and keep them in sync with `STEPS` in `src/components/home/TrackingSection.tsx`.
-- **404** → "Shipment not found" (make `trackShipment` throw; the UI should show an inline error — to build in Phase 3).
-- Rate-limit by IP; never return personal data beyond what is shown above.
-
-Implementation in `src/lib/api.ts`:
-
-```ts
-export async function trackShipment(no: string): Promise<TrackingResult> {
-  const r = await fetch(`${API_BASE}/api/track/${encodeURIComponent(no)}`);
-  if (!r.ok) throw new Error('Shipment not found');
-  return r.json();
-}
-```
+- **400** `{ "error": "Enter a tracking number like MAS1234567890." }` · **404** `{ "error": "No shipment found with this tracking number." }`.
+  `trackShipment()` throws with that message and the home page shows it as the Last Status.
+- Tracking numbers are `MAS` + 10 digits (printed on the invoice). It never returns names, phones, addresses or money,
+  so Shipper / Consignee stay empty.
+- `trackShipment()` maps the statuses onto the six steps (`STAGE` in `src/lib/api.ts`, `STEPS` in
+  `src/components/tracking/TrackingSection.tsx`) and shows times in Dubai time, newest first.
+- The billing app only answers this site's origin (CORS): its `TRACKING_URL` setting must be `https://<this site>/track/`.
+- **`/track/MAS1234567890`** on this site (the QR code printed on MAS invoices) opens the tracking page (`src/pages/TrackPage.tsx`)
+  with that shipment looked up. `/track` on its own shows the search form; every search goes to `/track/<no>`.
 
 ## 2. Request pickup
 
