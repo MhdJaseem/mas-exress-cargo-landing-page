@@ -2,13 +2,14 @@ import type { CSSProperties } from 'react';
 import type { TrackingResult } from '../../lib/api';
 import { Icon } from '../ui/Icon';
 
-// The order a shipment moves in (In Transit before At Destination). The billing app's statuses map onto these in
-// STAGE in src/lib/api.ts; "Arrived at Centre" waits for a warehouse status from the billing app.
+// The order a shipment moves in (Departed → In Transit → Arrived → Customs Clearance at the destination).
+// The billing app's statuses map onto these in STAGE in src/lib/api.ts.
 const STEPS = [
   'Booked & Dispatch',
-  'Arrived at Centre',
+  'Departed',
   'In Transit',
-  'At Destination',
+  'Arrived',
+  'Customs Clearance',
   'Out for Delivery',
   'Delivered',
 ];
@@ -64,7 +65,7 @@ export function TrackingSection({ result }: { result: TrackingResult | null }) {
             className="steps"
             id="steps"
             aria-label="Shipment Tracking History"
-            style={{ '--fill': fill } as CSSProperties}
+            style={{ '--fill': fill, '--n': STEPS.length } as CSSProperties}
           >
             {STEPS.map((s, i) => (
               <li

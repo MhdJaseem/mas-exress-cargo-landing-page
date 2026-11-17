@@ -26,7 +26,7 @@ export interface TrackingResult {
   serviceType?: string;
   pieces?: number | string;
   weight?: string;
-  /** Index of the current step in the progress bar, 0..5 (-1 = none). */
+  /** Index of the current step in the progress bar, 0..6 (-1 = none). */
   stage: number;
   history: TrackingEvent[];
 }
@@ -42,19 +42,31 @@ const STAGE: Record<string, number> = {
   booked: 0,
   packed: 0,
   picked_up: 0,
-  dispatched: 2,
-  departed: 2,
+  dispatched: 1,
+  departed: 1,
   in_transit: 2,
   arrived_destination: 3,
-  customs_clearance: 3,
-  out_for_delivery: 4,
-  delivered: 5,
+  customs_clearance: 4,
+  out_for_delivery: 5,
+  delivered: 6,
 };
 
 /** The billing app's answer: GET {API_BASE}/api/track?id=MAS1234567890 (MAS billing, app/api/track/route.ts) */
 interface BillingTracking {
   trackingId: string;
+  origin?: string;
   destination: string;
+  /** "Air", "Sea", "Road" … */
+  serviceType?: string;
+  pieces?: number;
+  /** decimal strings, e.g. "100.00" */
+  weightKg?: string;
+  actualWeightKg?: string;
+  /** yyyy-mm-dd */
+  bookingDate?: string;
+  /** shortened names, e.g. "Gowtham B." */
+  shipper?: string;
+  consignee?: string;
   latest: BillingEvent | null;
   events: BillingEvent[];
 }
@@ -77,13 +89,27 @@ const dubai = (iso: string, withTime = true) =>
     .format(new Date(iso))
     .replace(',', '');
 
+/** "2026-11-16" → "16/11/2026" (same format as the other dates) */
+const ymd = (d: string) => {
+  const m = /^(d{4})-(d{2})-(d{2})$/.exec(d);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
+};
+
+/** "100.00" → "100 kg"; missing or not a number → undefined (shown as —) */
+const kg = (v?: string) => {
+  const n = Number(v);
+  return v != null && v !== '' && Number.isFinite(n)
+    ? `${n.toLocaleString('en-GB', { maximumFractionDigits: 2 })} kg`
+    : undefined;
+};
+
 /** "mas 1234-567 890" → "MAS1234567890" */
 export const normalizeTrackingNo = (no: string) => no.toUpperCase().replace(/[\s-]/g, '');
 
 /**
  * Look up a shipment in the MAS billing app. Throws an Error whose message is shown to the customer
  * (not found, wrong format, or tracking not available).
- * The billing app never sends names, phones, addresses or money, so Shipper / Consignee stay empty.
+ * The billing app sends shortened shipper / consignee names only (no phones, addresses or money).
  */
 export async function trackShipment(no: string): Promise<TrackingResult> {
   const id = normalizeTrackingNo(no);
@@ -105,9 +131,14 @@ export async function trackShipment(no: string): Promise<TrackingResult> {
     no: data.trackingId,
     lastStatus: data.latest?.label,
     lastStatusDate: data.latest ? dubai(data.latest.time) : undefined,
-    bookingDate: events[0] ? dubai(events[0].time, false) : undefined,
-    origin: 'UAE',
+    bookingDate: data.bookingDate ? ymd(data.bookingDate) : events[0] ? dubai(events[0].time, false) : undefined,
+    shipper: data.shipper,
+    consignee: data.consignee,
+    origin: data.origin || 'UAE',
     destination: data.destination,
+    serviceType: data.serviceType,
+    pieces: data.pieces,
+    weight: kg(data.weightKg),
     stage,
     // newest first
     history: events

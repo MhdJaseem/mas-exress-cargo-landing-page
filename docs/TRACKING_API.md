@@ -13,21 +13,32 @@ Tracking comes from the MAS billing app (its `app/api/track/route.ts`), public, 
 ```json
 {
   "trackingId": "MAS1234567890",
+  "origin": "UAE",
   "destination": "India",
-  "latest": { "status": "in_transit", "label": "In transit", "location": "Dubai", "time": "2026-11-16T08:10:00.000Z" },
+  "serviceType": "Air",
+  "pieces": 1,
+  "weightKg": "100.00",
+  "actualWeightKg": "100.00",
+  "bookingDate": "2026-11-16",
+  "shipper": "Gowtham B.",
+  "consignee": "Mohammed A.",
+  "latest": { "status": "customs_clearance", "label": "Customs clearance", "location": "DXB", "time": "2026-11-16T19:05:00.000Z" },
   "events": [
-    { "status": "booked", "label": "Booked", "location": null, "time": "2026-11-14T06:00:00.000Z" },
-    { "status": "in_transit", "label": "In transit", "location": "Dubai", "time": "2026-11-16T08:10:00.000Z" }
+    { "status": "booked", "label": "Booked", "location": "Murar", "time": "2026-11-16T06:19:50.088Z" },
+    { "status": "picked_up", "label": "Picked up from branch", "location": "Murar", "time": "2026-11-16T08:57:52.063Z" },
+    { "status": "customs_clearance", "label": "Customs clearance", "location": "DXB", "time": "2026-11-16T19:05:00.000Z" }
   ]
 }
 ```
 
 - **400** `{ "error": "Enter a tracking number like MAS1234567890." }` · **404** `{ "error": "No shipment found with this tracking number." }`.
-  `trackShipment()` throws with that message and the home page shows it as the Last Status.
-- Tracking numbers are `MAS` + 10 digits (printed on the invoice). It never returns names, phones, addresses or money,
-  so Shipper / Consignee stay empty.
-- `trackShipment()` maps the statuses onto the six steps (`STAGE` in `src/lib/api.ts`, `STEPS` in
-  `src/components/tracking/TrackingSection.tsx`) and shows times in Dubai time, newest first.
+  `trackShipment()` throws with that message and the tracking page shows it as the Last Status.
+- Tracking numbers are `MAS` + 10 digits (printed on the invoice). Shipper / consignee are shortened names only; it never
+  returns phones, addresses or money. Weights are shown as "100 kg", `bookingDate` as dd/mm/yyyy.
+- `trackShipment()` maps the statuses onto the seven steps (booked / packed / picked_up → Booked & Dispatch, dispatched / departed → Departed,
+  in_transit → In Transit, arrived_destination → Arrived, customs_clearance → Customs Clearance,
+  out_for_delivery → Out for Delivery, delivered → Delivered; `STAGE` in `src/lib/api.ts`, `STEPS` in
+  `src/components/tracking/TrackingSection.tsx`). It shows times in Dubai time, newest first.
 - The billing app only answers this site's origin (CORS): its `TRACKING_URL` setting must be `https://<this site>/track/`.
 - **`/track/MAS1234567890`** on this site (the QR code printed on MAS invoices) opens the tracking page (`src/pages/TrackPage.tsx`)
   with that shipment looked up. `/track` on its own shows the search form; every search goes to `/track/<no>`.
