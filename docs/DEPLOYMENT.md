@@ -32,17 +32,17 @@ Cloudflare Pages · Netlify · Vercel (all free tiers suit this site; global CDN
 
 1. Push the repo to GitHub (Vercel deploys `main` to production and every PR / branch to a preview URL).
 2. vercel.com → Add New → Project → import the repo. Root directory: the folder containing `package.json` (`mas-vite` if the repo root is one level up). Leave build settings on defaults — `vercel.json` sets them.
-3. Settings → Environment Variables: `VITE_API_BASE` for Production and Preview (leave empty until the backend exists — the forms fall back to email drafts). `VITE_*` vars are baked in at build time, so redeploy after changing one.
+3. Settings → Environment Variables: `API_BASE` for Production and Preview (leave empty until the backend exists — the forms fall back to email drafts). `VITE_*` vars are baked in at build time, so redeploy after changing one.
 4. Settings → Domains: add `masexpresscargo.com` and `www.masexpresscargo.com`, set www as primary (apex redirects to it), then point DNS as Vercel shows (A `76.76.21.21` for apex, CNAME `cname.vercel-dns.com` for www). HTTPS is automatic.
 5. Check the preview URL against TESTING_QA.md before switching DNS; keep the old site live until then.
 
-Not set yet: a Content-Security-Policy (add once the API domain is known — it must allow `connect-src` to `VITE_API_BASE`, Google Fonts in `style-src`/`font-src`). Unknown URLs render the app's 404 page but return HTTP 200 (normal for an SPA; pre-rendering, 5.4, fixes it).
+Not set yet: a Content-Security-Policy (add once the API domain is known — it must allow `connect-src` to `API_BASE`, Google Fonts in `style-src`/`font-src`). Unknown URLs render the app's 404 page but return HTTP 200 (normal for an SPA; pre-rendering, 5.4, fixes it).
 
 ## Steps (Cloudflare Pages / Netlify style)
 
 1. Push the repo to GitHub.
 2. Create a project from the repo. Build command `npm run build`, output directory `dist`.
-3. Add env var `VITE_API_BASE` (production API URL).
+3. Add env var `API_BASE` (production API URL).
 4. Attach domain `www.masexpresscargo.com`; update DNS (CNAME) once approved; redirect apex → www.
 5. Keep the old site live until QA passes.
 

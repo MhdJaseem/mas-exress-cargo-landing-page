@@ -62,7 +62,7 @@ vercel.json           SPA rewrite + legacy redirects for Vercel
 ## Data flow
 
 ```
-form component → src/lib/api.ts → (future) backend at VITE_API_BASE
+form component → src/lib/api.ts → (future) backend at API_BASE
 ```
 
 Only `api.ts` knows about the network. Page copy lives in `src/data/` and the home section components; contact details in `src/lib/site.ts`.

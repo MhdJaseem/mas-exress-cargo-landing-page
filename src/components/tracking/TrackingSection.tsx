@@ -148,9 +148,9 @@ export function TrackingSection({ result }: { result: TrackingResult | null }) {
             </div>
           </div>
 
-          {import.meta.env.DEV && !import.meta.env.VITE_API_BASE && (
+          {import.meta.env.DEV && !import.meta.env.API_BASE && (
             <p className="note">
-              Developer note (dev server only): set <code>VITE_API_BASE</code> in <code>.env.local</code> to the MAS
+              Developer note (dev server only): set <code>API_BASE</code> in <code>.env.local</code> to the MAS
               billing app's address to load real tracking.
             </p>
           )}

@@ -51,7 +51,7 @@ mas-vite/
 ```
 
 - **Editing copy:** service pages → `src/data/services.ts`; testimonials, team, branches, client logos → `src/data/company.ts`; contact details → `src/lib/site.ts`; home sections → `src/components/home/`.
-- `src/lib/api.ts` is **the only place that talks to a backend**: `trackShipment()`, `submitPickup()`, `submitApplication()`. Set `VITE_API_BASE` in `.env.local` (see `.env.example`).
+- `src/lib/api.ts` is **the only place that talks to a backend**: `trackShipment()`, `submitPickup()`, `submitApplication()`. Set `API_BASE` in `.env.local` (see `.env.example`).
 - Hosting needs an SPA fallback (every path serves `index.html`); `public/_redirects` and `vercel.json` provide it. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Next: live tracking

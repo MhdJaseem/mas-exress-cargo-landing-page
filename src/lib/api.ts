@@ -5,8 +5,8 @@
    ------------------------------------------------------------------ */
 
 // The MAS billing app, which keeps the shipments, e.g. https://billing.masexpresscargo.com (no trailing slash).
-// Set VITE_API_BASE in .env.local and on Vercel. Empty = tracking shows "not available yet".
-export const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/, '');
+// Set API_BASE in .env.local and on Vercel. Empty = tracking shows "not available yet".
+export const API_BASE = (import.meta.env.API_BASE ?? '').replace(/\/+$/, '');
 
 export interface TrackingEvent {
   date: string;

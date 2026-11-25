@@ -6,7 +6,7 @@ The front end is ready; the backend is not. This is the contract `src/lib/api.ts
 
 Tracking comes from the MAS billing app (its `app/api/track/route.ts`), public, no sign-in:
 
-`GET {VITE_API_BASE}/api/track?id=MAS1234567890`
+`GET {API_BASE}/api/track?id=MAS1234567890`
 
 **200 response**
 
@@ -66,7 +66,7 @@ Tracking comes from the MAS billing app (its `app/api/track/route.ts`), public, 
 
 ## 2. Request pickup
 
-`POST {VITE_API_BASE}/api/pickup`
+`POST {API_BASE}/api/pickup`
 
 ```json
 { "phone": "+971 501234567", "mode": "Air Freight", "date": "2026-10-25", "time": "10:00" }
@@ -88,5 +88,5 @@ CORS allow-list the site origin only · HTTPS only · validate/sanitise all fiel
 
 ## 3. Job application (careers page)
 
-`POST {VITE_API_BASE}/api/apply` as `multipart/form-data`: `name`, `email`, `phone`, `experience`, `cv` (PDF/DOC, max ~5 MB).
+`POST {API_BASE}/api/apply` as `multipart/form-data`: `name`, `email`, `phone`, `experience`, `cv` (PDF/DOC, max ~5 MB).
 Responses: `201 {id}`; `400 {errors:[...]}`. Until this exists, `submitApplication()` in `src/lib/api.ts` opens an email draft to masexpresscargodubai@gmail.com and asks the applicant to attach the CV by hand (a mailto link cannot carry attachments). Confirm the recipient address with MAS. Scan uploads and never expose them publicly.
