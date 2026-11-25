@@ -7,6 +7,9 @@ import react from '@vitejs/plugin-react';
 // fallback — see public/_redirects (Netlify / Cloudflare Pages) and vercel.json.
 export default defineConfig({
   plugins: [react()],
+  // Only env vars starting with these prefixes reach browser code (import.meta.env).
+  // 'API_BASE' (not 'API_') so a future API_KEY / API_SECRET can never leak into the bundle.
+  envPrefix: ['VITE_', 'API_BASE'],
   server: { port: 5173 },
   preview: { port: 4173 },
 });

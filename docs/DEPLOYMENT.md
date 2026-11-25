@@ -32,7 +32,7 @@ Cloudflare Pages · Netlify · Vercel (all free tiers suit this site; global CDN
 
 1. Push the repo to GitHub (Vercel deploys `main` to production and every PR / branch to a preview URL).
 2. vercel.com → Add New → Project → import the repo. Root directory: the folder containing `package.json` (`mas-vite` if the repo root is one level up). Leave build settings on defaults — `vercel.json` sets them.
-3. Settings → Environment Variables: `API_BASE` for Production and Preview (leave empty until the backend exists — the forms fall back to email drafts). `VITE_*` vars are baked in at build time, so redeploy after changing one.
+3. Settings → Environment Variables: `API_BASE` for Production and Preview (leave empty until the backend exists — the forms fall back to email drafts). Vars exposed to the browser (`API_BASE`, `VITE_*` — see `envPrefix` in `vite.config.ts`) are baked in at build time, so redeploy after changing one.
 4. Settings → Domains: add `masexpresscargo.com` and `www.masexpresscargo.com`, set www as primary (apex redirects to it), then point DNS as Vercel shows (A `76.76.21.21` for apex, CNAME `cname.vercel-dns.com` for www). HTTPS is automatic.
 5. Check the preview URL against TESTING_QA.md before switching DNS; keep the old site live until then.
 
