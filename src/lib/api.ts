@@ -14,6 +14,15 @@ export interface TrackingEvent {
   location: string;
 }
 
+/** The delivery company at the destination that has taken the shipment over for the last part of the journey */
+export interface Handover {
+  company: string;
+  /** The number that company gave the shipment */
+  trackingNo: string;
+  /** The company's own tracking page for that number; undefined when MAS has no link for the company */
+  url?: string;
+}
+
 export interface TrackingResult {
   no: string;
   lastStatusDate?: string;
@@ -29,6 +38,8 @@ export interface TrackingResult {
   /** Index of the current step in the progress bar, 0..6 (-1 = none). */
   stage: number;
   history: TrackingEvent[];
+  /** Set once the delivery company has the shipment: the page then sends the customer to the company's tracking */
+  handover?: Handover;
 }
 
 /** Shown in the result panel when the tracking service can't be reached (or isn't set up yet) */
@@ -69,6 +80,8 @@ interface BillingTracking {
   consignee?: string;
   latest: BillingEvent | null;
   events: BillingEvent[];
+  /** null until MAS hands the shipment to the delivery company at the destination */
+  handover?: { company: string; trackingNo: string; url: string | null } | null;
 }
 interface BillingEvent {
   status: string;
@@ -91,7 +104,7 @@ const dubai = (iso: string, withTime = true) =>
 
 /** "2026-11-16" → "16/11/2026" (same format as the other dates) */
 const ymd = (d: string) => {
-  const m = /^(d{4})-(d{2})-(d{2})$/.exec(d);
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d);
   return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
 };
 
@@ -140,6 +153,14 @@ export async function trackShipment(no: string): Promise<TrackingResult> {
     pieces: data.pieces,
     weight: kg(data.weightKg),
     stage,
+    handover: data.handover
+      ? {
+          company: data.handover.company,
+          trackingNo: data.handover.trackingNo,
+          // only plain web links become a button
+          url: data.handover.url && /^https?:\/\//i.test(data.handover.url) ? data.handover.url : undefined,
+        }
+      : undefined,
     // newest first
     history: events
       .slice()

@@ -27,7 +27,8 @@ Tracking comes from the MAS billing app (its `app/api/track/route.ts`), public, 
     { "status": "booked", "label": "Booked", "location": "Murar", "time": "2026-11-16T06:19:50.088Z" },
     { "status": "picked_up", "label": "Picked up from branch", "location": "Murar", "time": "2026-11-16T08:57:52.063Z" },
     { "status": "customs_clearance", "label": "Customs clearance", "location": "DXB", "time": "2026-11-16T19:05:00.000Z" }
-  ]
+  ],
+  "handover": { "company": "UPS", "trackingNo": "1Z999AA1", "url": "https://www.ups.com/track?tracknum=1Z999AA1" }
 }
 ```
 
@@ -39,6 +40,11 @@ Tracking comes from the MAS billing app (its `app/api/track/route.ts`), public, 
   in_transit → In Transit, arrived_destination → Arrived, customs_clearance → Customs Clearance,
   out_for_delivery → Out for Delivery, delivered → Delivered; `STAGE` in `src/lib/api.ts`, `STEPS` in
   `src/components/tracking/TrackingSection.tsx`). It shows times in Dubai time, newest first.
+- **`handover`** is `null` until MAS hands the shipment to the delivery company at the destination (operations type that
+  company's tracking number in the billing app, Shipments → Delivery tracking). Then it carries the company's name, its
+  number and `url`, a link to the company's own tracking page (`null` when MAS has no link for that company). The result
+  panel shows a "Handed over to … for delivery" card above the summary with a **Track on …** button (new tab); without a
+  link it shows the number and asks the customer to track it on the company's website. The MAS history stays below.
 - The billing app only answers this site's origin (CORS): its `TRACKING_URL` setting must be `https://<this site>/track/`.
 - **`/track/MAS1234567890`** on this site (the QR code printed on MAS invoices) opens the tracking page (`src/pages/TrackPage.tsx`)
   with that shipment looked up. `/track` on its own shows the search form; every search goes to `/track/<no>`.

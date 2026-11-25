@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import type { TrackingResult } from '../../lib/api';
+import type { Handover, TrackingResult } from '../../lib/api';
 import { Icon } from '../ui/Icon';
 
 // The order a shipment moves in (Departed → In Transit → Arrived → Customs Clearance at the destination).
@@ -79,6 +79,8 @@ export function TrackingSection({ result }: { result: TrackingResult | null }) {
             ))}
           </ol>
 
+          {r?.handover && <HandoverCard h={r.handover} />}
+
           <div className="tgrid">
             <div>
               <h3>
@@ -157,6 +159,31 @@ export function TrackingSection({ result }: { result: TrackingResult | null }) {
     </section>
   );
 }
+
+/**
+ * Shown once MAS has handed the shipment to the delivery company at the destination (both routes: MAS flies it and the
+ * company only delivers, or the company carries it all from the warehouse). From here the company's own tracking is the
+ * up-to-date one, so the button opens it in a new tab; the MAS history below stays for the journey so far.
+ */
+const HandoverCard = ({ h }: { h: Handover }) => (
+  <div className="handover" role="status">
+    <span className="ic">
+      <Icon name="truck" />
+    </span>
+    <div className="ho-text">
+      <h3>Handed over to {h.company} for delivery</h3>
+      <p>
+        {h.company} tracking no. <b>{h.trackingNo}</b>
+        {h.url ? null : <> · Track it on {h.company}'s website with this number.</>}
+      </p>
+    </div>
+    {h.url && (
+      <a className="btn brand" href={h.url} target="_blank" rel="noopener noreferrer">
+        Track on {h.company} <Icon name="arrow" />
+      </a>
+    )}
+  </div>
+);
 
 const Pair = ({ k, v }: { k: string; v: unknown }) => (
   <>
