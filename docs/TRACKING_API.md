@@ -22,11 +22,26 @@ Tracking comes from the MAS billing app (its `app/api/track/route.ts`), public, 
   "bookingDate": "2026-11-16",
   "shipper": "Gowtham B.",
   "consignee": "Mohammed A.",
-  "latest": { "status": "customs_clearance", "label": "Customs clearance", "location": "DXB", "time": "2026-11-16T19:05:00.000Z" },
+  "latest": {
+    "status": "customs_clearance",
+    "label": "Customs clearance",
+    "location": "DXB",
+    "time": "2026-11-16T19:05:00.000Z"
+  },
   "events": [
     { "status": "booked", "label": "Booked", "location": "Murar", "time": "2026-11-16T06:19:50.088Z" },
-    { "status": "picked_up", "label": "Picked up from branch", "location": "Murar", "time": "2026-11-16T08:57:52.063Z" },
-    { "status": "customs_clearance", "label": "Customs clearance", "location": "DXB", "time": "2026-11-16T19:05:00.000Z" }
+    {
+      "status": "picked_up",
+      "label": "Picked up from branch",
+      "location": "Murar",
+      "time": "2026-11-16T08:57:52.063Z"
+    },
+    {
+      "status": "customs_clearance",
+      "label": "Customs clearance",
+      "location": "DXB",
+      "time": "2026-11-16T19:05:00.000Z"
+    }
   ],
   "handover": { "company": "UPS", "trackingNo": "1Z999AA1", "url": "https://www.ups.com/track?tracknum=1Z999AA1" }
 }
