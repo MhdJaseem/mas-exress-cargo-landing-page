@@ -151,7 +151,8 @@ export async function trackShipment(no: string): Promise<TrackingResult> {
     destination: data.destination,
     serviceType: data.serviceType,
     pieces: data.pieces,
-    weight: kg(data.weightKg),
+    // the actual (scale) weight; older responses may only carry weightKg
+    weight: kg(data.actualWeightKg) ?? kg(data.weightKg),
     stage,
     handover: data.handover
       ? {
